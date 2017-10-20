@@ -9,7 +9,11 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    var points = 0
 
+    @IBOutlet weak var textoPuntos: UITextField!
+    @IBOutlet weak var seconds: UITextField!
 
     @IBOutlet weak var num: UIButton!
     @IBOutlet weak var num2: UIButton!
@@ -18,31 +22,26 @@ class ViewController: UIViewController {
     @IBOutlet weak var num5: UIButton!
     @IBOutlet weak var num6: UIButton!
     
+    @IBOutlet weak var winer: UITextField!
+    @IBOutlet weak var reboot: UIButton!
+    
+    var clock:Timer  = Timer() //= Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(ViewController.countdown), userInfo: nil, repeats: true)
+    
+    var timer = 30;
+    
+    @IBAction func gameReboot(_ sender: Any) {
+        
+        winer.isHidden = true
+        reboot.isHidden = true;
+        
+        startGame()
+    }
+    
     
     @IBAction func grupoBotones(_ sender: Any) {
-        switch (sender as AnyObject).tag {
-        case 0:
-            print("1")
-            break
-        case 1:
-            print("2")
-            break
-        case 2:
-            print("3")
-            break
-        case 3:
-            print("4")
-            break
-        case 4:
-            print("5")
-            break
-        case 5:
-            print("6")
-            break
-            
-        default:
-            print("default")
-        }
+        checkValue(check: sender as! UIButton)
+        
+        checkFinal()
     }
  
     
@@ -51,33 +50,46 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view, typically from a nib.
-        randomValues()
-        putRandomValues()
-        
-//        num.addTarget(self, action: #selector(checkNumber(sender:self)), for: .touchUpInside)
+        startGame()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
+    func startGame(){
+        randomNumvers.removeAll()
+        randomValues()
+        putRandomValues()
+        
+        print("salgo de putRandomVALUES")
+        num.isHidden = false;
+        num2.isHidden = false;
+        num3.isHidden = false;
+        num4.isHidden = false;
+        num5.isHidden = false;
+        num6.isHidden = false;
+        
+        timer = 30;
+        
+        seconds.text = String(timer)
+        
+        print("aaa")
+        
+
+        
+        clock = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(ViewController.countdown), userInfo: nil, repeats: true)
+    }
     
     
     func randomValues() {
         let lower = -100
         let upper = 100
         for _ in 1..<7 {
-           //let valor = UInt32(generateRandomValues(lower: lower, upper: upper))
             print(randomNumvers.append(Int(arc4random_uniform(UInt32(upper - lower + 1))) +   lower))
         }
+        
     }
-    
-    /*
-    func generateRandomValues(lower:Int, upper:Int) -> Int {
-        return
-    }*/
     
     func putRandomValues(){
         num.setTitle("\(randomNumvers[0])", for: .normal)
@@ -89,7 +101,62 @@ class ViewController: UIViewController {
         
         randomNumvers.sort()
         print(randomNumvers)
+       
+    }
+    
+    func checkValue(check:UIButton) {
+        
+        let value = check.currentTitle
+        
+        print(" eeooooo \(String(describing: value))")
+        
+        if Int(value!)! == randomNumvers[0] {
+            randomNumvers.remove(at: 0)
+            
+            print("true")
+            
+            check.isHidden = true
+        }
+        else {
+            print("false")
+        }
+    }
+    
+    func checkFinal(){
+        if randomNumvers.count == 0 {
+            
+            winer.text = "HAS GANADO!"
+            
+            points += 1
+            textoPuntos.text = String(points)
+            
+            showFinal()
+        }
+    }
+    
+    func countdown() {
+        timer -= 1
+        
+        if timer < 1 {
+            winer.text = "HAS PERDIDO!"
+            showFinal()
+        }
+        
+        seconds.text = String(timer)
     }
 
+    func showFinal() {
+        num.isHidden = true;
+        num2.isHidden = true;
+        num3.isHidden = true;
+        num4.isHidden = true;
+        num5.isHidden = true;
+        num6.isHidden = true;
+        
+        winer.isHidden = false;
+        reboot.isHidden = false;
+        
+        clock.invalidate()
+    }
 }
 
